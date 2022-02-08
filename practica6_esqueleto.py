@@ -5,9 +5,8 @@
 # Ejemplo parseo argumentos
 
 import argparse
-import random
-#import matplotlib.pyplot as plt
-#import numpy as np
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 class LayoutGraph:
@@ -33,8 +32,31 @@ class LayoutGraph:
         self.fuerzasX = {}
 
         for ver in (grafo[0]):
-            self.posicionesX[ver] = random.random()*10
-            self.posicionesY[ver] = random.random()*10
+            self.posicionesX[ver] = np.random.rand()*10
+            self.posicionesY[ver] = np.random.rand()*10
+
+        posXver = self.posicionesX.values()
+        posYver = self.posicionesY.values()
+        fig, ax = plt.subplots()
+        
+        ax.scatter(posXver, posYver, s = 20, c = "Black")
+    
+        inicio_x_ari = []
+        final_x_ari = []
+        inicio_y_ari = []
+        final_y_ari = []
+
+        for ari in (grafo[1]):
+            inicio_x_ari.append(self.posicionesX[ari[0]])
+            final_x_ari.append(self.posicionesX[ari[1]])
+            inicio_y_ari.append(self.posicionesY[ari[0]])
+            final_y_ari.append(self.posicionesY[ari[1]])
+
+        ax.plot(np.array([inicio_x_ari, final_x_ari]), np.array([inicio_y_ari, final_y_ari]), color="Blue")
+
+        ax.set_xlim(0, 10)
+        ax.set_ylim(0, 10)
+        plt.show()
 
         # Guardo opciones
         self.iters = iters
@@ -109,7 +131,7 @@ def main():
         const_atraccion=5.0,
         verbose=args.verbose
     )
-
+    print(grafo)
     print(layout_gr.posicionesX)
     print(layout_gr.posicionesY)
 
