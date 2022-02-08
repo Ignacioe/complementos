@@ -1,6 +1,6 @@
 #! /usr/bin/python
 
-# 6ta Practica Laboratorio 
+# 6ta Practica Laboratorio
 # Complementos Matematicos I
 # Ejemplo parseo argumentos
 
@@ -17,8 +17,8 @@ class LayoutGraph:
         grafo: grafo en formato lista
         iters: cantidad de iteraciones a realizar
         refresh: cada cuantas iteraciones graficar. Si su valor es cero, entonces debe graficarse solo al final.
-        c1: constante de repulsion
-        c2: constante de atraccion
+        const_repulsion: constante de repulsion
+        const_atraccion: constante de atraccion
         verbose: si esta encendido, activa los comentarios
         """
 
@@ -27,16 +27,18 @@ class LayoutGraph:
 
         # Inicializo estado
         # Completar
-        self.posiciones = {}
-        self.fuerzas = {}
+        self.posicionesX = {}
+        self.posicionesY = {}
+        self.fuerzasX = {}
+        self.fuerzasX = {}
 
         # Guardo opciones
         self.iters = iters
         self.verbose = verbose
         # TODO: faltan opciones
         self.refresh = refresh
-        self.c1 = c1
-        self.c2 = c2
+        self.const_repulsion = const_repulsion
+        self.const_atraccion = const_atraccion
 
     def layout(self):
         """
@@ -57,7 +59,7 @@ def leer_grafo(nom_arch):
         ari.append(tuple(linea.rstrip("\n").split()))
 
     archivo.close()
-    
+
     return (ver,ari)
 
 
