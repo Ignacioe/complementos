@@ -5,21 +5,21 @@
 # Ejemplo parseo argumentos
 
 import argparse
-import matplotlib.pyplot as plt
-import numpy as np
+#import matplotlib.pyplot as plt
+#import numpy as np
 
 
 class LayoutGraph:
 
     def __init__(self, grafo, iters, refresh, c1, c2, verbose=False):
         """
-        Parámetros:
+        Parametros:
         grafo: grafo en formato lista
         iters: cantidad de iteraciones a realizar
-        refresh: cada cuántas iteraciones graficar. Si su valor es cero, entonces debe graficarse solo al final.
-        c1: constante de repulsión
-        c2: constante de atracción
-        verbose: si está encendido, activa los comentarios
+        refresh: cada cuantas iteraciones graficar. Si su valor es cero, entonces debe graficarse solo al final.
+        c1: constante de repulsion
+        c2: constante de atraccion
+        verbose: si esta encendido, activa los comentarios
         """
 
         # Guardo el grafo
@@ -44,6 +44,21 @@ class LayoutGraph:
         un layout
         """
         pass
+
+def leer_grafo(nom_arch):
+    ver = []
+    ari = []
+
+    archivo = open(nom_arch,"r")
+    cver = int(archivo.readline().rstrip("\n"))
+    for i in range(0,cver):
+        ver.append(archivo.readline().rstrip("\n"))
+    for linea in archivo:
+        ari.append(tuple(linea.rstrip("\n").split()))
+
+    archivo.close()
+    
+    return (ver,ari)
 
 
 def main():
@@ -83,6 +98,7 @@ def main():
     print(args.iters)
     print(args.file_name)
     print(args.temp)
+    print(leer_grafo(args.file_name))
     return
 
     # # TODO: Borrar antes de la entrega
