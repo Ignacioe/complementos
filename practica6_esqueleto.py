@@ -103,10 +103,6 @@ def main():
     print(leer_grafo(args.file_name))
     return
 
-    # # TODO: Borrar antes de la entrega
-    # grafo1 = ([1, 2, 3, 4, 5, 6, 7],
-    #           [(1, 2), (2, 3), (3, 4), (4, 5), (5, 6), (6, 7), (7, 1)])
-    #
     # # Creamos nuestro objeto LayoutGraph
     # layout_gr = LayoutGraph(
     #     grafo1,  # TODO: Cambiar para usar grafo leido de archivo
