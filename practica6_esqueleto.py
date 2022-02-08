@@ -5,6 +5,7 @@
 # Ejemplo parseo argumentos
 
 import argparse
+import random
 #import matplotlib.pyplot as plt
 #import numpy as np
 
@@ -26,11 +27,14 @@ class LayoutGraph:
         self.grafo = grafo
 
         # Inicializo estado
-        # Completar
         self.posicionesX = {}
         self.posicionesY = {}
         self.fuerzasX = {}
         self.fuerzasX = {}
+
+        for ver in (grafo[0]):
+            self.posicionesX[ver] = random.random()*10
+            self.posicionesY[ver] = random.random()*10
 
         # Guardo opciones
         self.iters = iters
@@ -105,7 +109,9 @@ def main():
         const_atraccion=5.0,
         verbose=args.verbose
     )
-    print(layout_gr.grafo)
+
+    print(layout_gr.posicionesX)
+    print(layout_gr.posicionesY)
 
     return
     # Ejecutamos el layout
