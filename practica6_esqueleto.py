@@ -11,7 +11,7 @@ import argparse
 
 class LayoutGraph:
 
-    def __init__(self, grafo, iters, refresh, c1, c2, verbose=False):
+    def __init__(self, grafo, iters, refresh, const_repulsion, const_atraccion, verbose=False):
         """
         Parametros:
         grafo: grafo en formato lista
@@ -57,7 +57,6 @@ def leer_grafo(nom_arch):
         ver.append(archivo.readline().rstrip("\n"))
     for linea in archivo:
         ari.append(tuple(linea.rstrip("\n").split()))
-
     archivo.close()
 
     return (ver,ari)
@@ -95,25 +94,21 @@ def main():
 
     args = parser.parse_args()
 
-    # Descomentar abajo para ver funcionamiento de argparse
-    print(args.verbose)
-    print(args.iters)
-    print(args.file_name)
-    print(args.temp)
-    print(leer_grafo(args.file_name))
-    return
+    grafo = leer_grafo(args.file_name)
 
-    # # Creamos nuestro objeto LayoutGraph
-    # layout_gr = LayoutGraph(
-    #     grafo1,  # TODO: Cambiar para usar grafo leido de archivo
-    #     iters=args.iters,
-    #     refresh=1,
-    #     c1=0.1,
-    #     c2=5.0,
-    #     verbose=args.verbose
-    # )
-    #
-    # # Ejecutamos el layout
+    # Creamos nuestro objeto LayoutGraph
+    layout_gr = LayoutGraph(
+        grafo=grafo, 
+        iters=args.iters,
+        refresh=1,
+        const_repulsion=0.1,
+        const_atraccion=5.0,
+        verbose=args.verbose
+    )
+    print(layout_gr.grafo)
+
+    return
+    # Ejecutamos el layout
     # layout_gr.layout()
     # return
 
