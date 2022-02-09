@@ -1,5 +1,3 @@
-#! /usr/bin/python
-
 import argparse
 import matplotlib.pyplot as plt
 import numpy as np
@@ -65,11 +63,18 @@ class LayoutGraph:
         ax.set_ylim(0, 10)
         plt.show()
 
-    def calcular_fuerza(self, ari):
+    def fuerza_atraccion(self, ari):
         inicio_x = self.posicionesX[ari[0]]
         final_x = self.posicionesX[ari[1]]
         inicio_y = self.posicionesY[ari[0]]
         final_y = self.posicionesY[ari[1]]
+        return math.sqrt(((final_x - inicio_x)**2)+((final_y - inicio_y)**2))
+
+    def fuerza_repulsion(self, ver1, ver2):
+        inicio_x = self.posicionesX[ver1]
+        final_x = self.posicionesX[ver2]
+        inicio_y = self.posicionesY[ver1]
+        final_y = self.posicionesY[ver2]
         return math.sqrt(((final_x - inicio_x)**2)+((final_y - inicio_y)**2))
 
     # Aplica el algoritmo de Fruchtermann-Reingold para obtener (y mostrar) un layout
@@ -82,12 +87,20 @@ class LayoutGraph:
             self.inicializar_fuerzas()
             #Calcular fuerzas
             for ari in self.grafo[1]:
-                fuerza = self.calcular_fuerza(ari)
+                fuerza = self.fuerza_atraccion(ari)
                 self.fuerzasX[ari[0]] += fuerza
                 self.fuerzasY[ari[1]] -= fuerza
                 print(ari)
                 print(self.fuerzasX)
                 print(self.fuerzasY)
+
+            for v1 in self.grafo[0]:
+                for v2 in self.grafo[0]:
+                    if v1 != v2:
+                        fuerza = self.fuerza_repulsion(v1,v2)
+                        self.fuerzasX[v1] += fuerza
+                        self.fuerzasY[v2] -= fuerza
+
         self.dibujar()
 
         pass
