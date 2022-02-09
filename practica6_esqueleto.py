@@ -29,16 +29,40 @@ class LayoutGraph:
         self.posicionesX = {}
         self.posicionesY = {}
         self.fuerzasX = {}
-        self.fuerzasX = {}
+        self.fuerzasY = {}
 
-        for ver in (grafo[0]):
+        # Guardo opciones
+        self.iters = iters
+        self.verbose = verbose
+        # TODO: faltan opciones
+        self.refresh = refresh
+        self.const_repulsion = const_repulsion
+        self.const_atraccion = const_atraccion
+
+    def inicializar_fuerzas(self):
+        for nodo in (self.grafo[0]):
+            self.fuerzasX[nodo] = 0
+            self.fuerzasY[nodo] = 0
+        return
+
+    """
+        Aplica el algoritmo de Fruchtermann-Reingold para obtener (y mostrar)
+        un layout
+    """
+    def layout(self):
+        for ver in (self.grafo[0]):
             self.posicionesX[ver] = np.random.rand()*10
             self.posicionesY[ver] = np.random.rand()*10
 
         posXver = self.posicionesX.values()
         posYver = self.posicionesY.values()
         fig, ax = plt.subplots()
-        
+
+        for iteracion in range(0,self.iters):
+            self.inicializar_fuerzas()
+
+        print(self.fuerzasX)
+        print(self.fuerzasY)
         ax.scatter(posXver, posYver, s = 20, c = "Black")
     
         inicio_x_ari = []
@@ -46,7 +70,7 @@ class LayoutGraph:
         inicio_y_ari = []
         final_y_ari = []
 
-        for ari in (grafo[1]):
+        for ari in (self.grafo[1]):
             inicio_x_ari.append(self.posicionesX[ari[0]])
             final_x_ari.append(self.posicionesX[ari[1]])
             inicio_y_ari.append(self.posicionesY[ari[0]])
@@ -58,19 +82,6 @@ class LayoutGraph:
         ax.set_ylim(0, 10)
         plt.show()
 
-        # Guardo opciones
-        self.iters = iters
-        self.verbose = verbose
-        # TODO: faltan opciones
-        self.refresh = refresh
-        self.const_repulsion = const_repulsion
-        self.const_atraccion = const_atraccion
-
-    def layout(self):
-        """
-        Aplica el algoritmo de Fruchtermann-Reingold para obtener (y mostrar)
-        un layout
-        """
         pass
 
 def leer_grafo(nom_arch):
@@ -131,14 +142,10 @@ def main():
         const_atraccion=5.0,
         verbose=args.verbose
     )
-    print(grafo)
-    print(layout_gr.posicionesX)
-    print(layout_gr.posicionesY)
 
-    return
     # Ejecutamos el layout
-    # layout_gr.layout()
-    # return
+    layout_gr.layout()
+    return
 
 
 if __name__ == '__main__':
