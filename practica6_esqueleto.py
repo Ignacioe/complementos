@@ -41,6 +41,7 @@ class LayoutGraph:
             self.fuerzasY[nodo] = 0
         return
 
+    #Genera el grafico del grafo
     def dibujar(self):
         posXver = self.posicionesX.values()
         posYver = self.posicionesY.values()
@@ -64,6 +65,13 @@ class LayoutGraph:
         ax.set_ylim(0, 10)
         plt.show()
 
+    def calcular_fuerza(self, ari):
+        inicio_x = self.posicionesX[ari[0]]
+        final_x = self.posicionesX[ari[1]]
+        inicio_y = self.posicionesY[ari[0]]
+        final_y = self.posicionesY[ari[1]]
+        return math.sqrt(((final_x - inicio_x)**2)+((final_y - inicio_y)**2))
+
     # Aplica el algoritmo de Fruchtermann-Reingold para obtener (y mostrar) un layout
     def layout(self):
         for ver in (self.grafo[0]):
@@ -74,13 +82,12 @@ class LayoutGraph:
             self.inicializar_fuerzas()
             #Calcular fuerzas
             for ari in self.grafo[1]:
-                inicio_x = self.posicionesX[ari[0]]
-                final_x = self.posicionesX[ari[1]]
-                inicio_y = self.posicionesY[ari[0]]
-                final_y = self.posicionesY[ari[1]]
-                fuerza = math.sqrt(((final_x - inicio_x)**2)+((final_y - inicio_y)**2))
+                fuerza = self.calcular_fuerza(ari)
                 self.fuerzasX[ari[0]] += fuerza
                 self.fuerzasY[ari[1]] -= fuerza
+                print(ari)
+                print(self.fuerzasX)
+                print(self.fuerzasY)
         self.dibujar()
 
         pass
@@ -115,7 +122,7 @@ def main():
         '--iters',
         type=int,
         help='Cantidad de iteraciones a efectuar',
-        default=2
+        default=1
     )
     # Temperatura inicial
     parser.add_argument(
