@@ -7,6 +7,7 @@
 import argparse
 import matplotlib.pyplot as plt
 import numpy as np
+import math
 
 
 class LayoutGraph:
@@ -60,9 +61,16 @@ class LayoutGraph:
 
         for iteracion in range(0,self.iters):
             self.inicializar_fuerzas()
+            #Calcular fuerzas
+            for ari in self.grafo[1]:
+                inicio_x = self.posicionesX[ari[0]]
+                final_x = self.posicionesX[ari[1]]
+                inicio_y = self.posicionesY[ari[0]]
+                final_y = self.posicionesY[ari[1]]
+                fuerza = math.sqrt(((final_x - inicio_x)**2)+((final_y - inicio_y)**2))
+                self.fuerzasX[ari[0]] += fuerza
+                self.fuerzasY[ari[1]] -= fuerza
 
-        print(self.fuerzasX)
-        print(self.fuerzasY)
         ax.scatter(posXver, posYver, s = 20, c = "Black")
     
         inicio_x_ari = []
