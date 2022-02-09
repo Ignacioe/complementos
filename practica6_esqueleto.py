@@ -1,14 +1,9 @@
 #! /usr/bin/python
 
-# 6ta Practica Laboratorio
-# Complementos Matematicos I
-# Ejemplo parseo argumentos
-
 import argparse
 import matplotlib.pyplot as plt
 import numpy as np
 import math
-
 
 class LayoutGraph:
 
@@ -46,33 +41,12 @@ class LayoutGraph:
             self.fuerzasY[nodo] = 0
         return
 
-    """
-        Aplica el algoritmo de Fruchtermann-Reingold para obtener (y mostrar)
-        un layout
-    """
-    def layout(self):
-        for ver in (self.grafo[0]):
-            self.posicionesX[ver] = np.random.rand()*10
-            self.posicionesY[ver] = np.random.rand()*10
-
+    def dibujar(self):
         posXver = self.posicionesX.values()
         posYver = self.posicionesY.values()
         fig, ax = plt.subplots()
-
-        for iteracion in range(0,self.iters):
-            self.inicializar_fuerzas()
-            #Calcular fuerzas
-            for ari in self.grafo[1]:
-                inicio_x = self.posicionesX[ari[0]]
-                final_x = self.posicionesX[ari[1]]
-                inicio_y = self.posicionesY[ari[0]]
-                final_y = self.posicionesY[ari[1]]
-                fuerza = math.sqrt(((final_x - inicio_x)**2)+((final_y - inicio_y)**2))
-                self.fuerzasX[ari[0]] += fuerza
-                self.fuerzasY[ari[1]] -= fuerza
-
         ax.scatter(posXver, posYver, s = 20, c = "Black")
-    
+
         inicio_x_ari = []
         final_x_ari = []
         inicio_y_ari = []
@@ -89,6 +63,25 @@ class LayoutGraph:
         ax.set_xlim(0, 10)
         ax.set_ylim(0, 10)
         plt.show()
+
+    # Aplica el algoritmo de Fruchtermann-Reingold para obtener (y mostrar) un layout
+    def layout(self):
+        for ver in (self.grafo[0]):
+            self.posicionesX[ver] = np.random.rand()*10
+            self.posicionesY[ver] = np.random.rand()*10
+
+        for iteracion in range(0,self.iters):
+            self.inicializar_fuerzas()
+            #Calcular fuerzas
+            for ari in self.grafo[1]:
+                inicio_x = self.posicionesX[ari[0]]
+                final_x = self.posicionesX[ari[1]]
+                inicio_y = self.posicionesY[ari[0]]
+                final_y = self.posicionesY[ari[1]]
+                fuerza = math.sqrt(((final_x - inicio_x)**2)+((final_y - inicio_y)**2))
+                self.fuerzasX[ari[0]] += fuerza
+                self.fuerzasY[ari[1]] -= fuerza
+        self.dibujar()
 
         pass
 
@@ -122,7 +115,7 @@ def main():
         '--iters',
         type=int,
         help='Cantidad de iteraciones a efectuar',
-        default=50
+        default=2
     )
     # Temperatura inicial
     parser.add_argument(
