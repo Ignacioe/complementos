@@ -1,4 +1,5 @@
 import argparse
+from cmath import sqrt
 import matplotlib.pyplot as plt
 import numpy as np
 import math
@@ -33,6 +34,9 @@ class LayoutGraph:
         self.const_repulsion = const_repulsion
         self.const_atraccion = const_atraccion
 
+        # Cambiar por constantes!!!!!!!!!!!!!!!!!!!!
+        self.k = 1 * math.sqrt(100/len(grafo[0]))
+
     def inicializar_fuerzas(self):
         for nodo in (self.grafo[0]):
             self.fuerzasX[nodo] = 0
@@ -63,37 +67,57 @@ class LayoutGraph:
         ax.set_ylim(0, 10)
         plt.show()
 
-    def fuerza_atraccion(self, ari):
-        inicio_x = self.posicionesX[ari[0]]
-        final_x = self.posicionesX[ari[1]]
-        inicio_y = self.posicionesY[ari[0]]
-        final_y = self.posicionesY[ari[1]]
-        return math.sqrt(((final_x - inicio_x)**2)+((final_y - inicio_y)**2))
-
-    def fuerza_repulsion(self, ver1, ver2):
-        inicio_x = self.posicionesX[ver1]
-        final_x = self.posicionesX[ver2]
-        inicio_y = self.posicionesY[ver1]
-        final_y = self.posicionesY[ver2]
-        return math.sqrt(((final_x - inicio_x)**2)+((final_y - inicio_y)**2))
-
-    # Aplica el algoritmo de Fruchtermann-Reingold para obtener (y mostrar) un layout
-    def layout(self):
+    def random_pos(self):
         for ver in (self.grafo[0]):
             self.posicionesX[ver] = np.random.rand()*10
             self.posicionesY[ver] = np.random.rand()*10
 
+    def f_atraccion(self, d): return d^2/self.k
+
+    def f_repulsion(self, d): return self.k^2/d
+
+    def computar_fuerzas_atraccion(self):
+        for ari in self.grafo[1]:
+            v1 = ari[0]
+            v2 = ari[1]
+            x1 = self.posicionesX[v1]
+            x2 = self.posicionesX[v2]
+            y1 = self.posicionesY[v1]
+            y2 = self.posicionesY[v2]
+            dis = math.sqrt(((x2 - x1)**2)+((y2 - y1)**2))
+            mod_fa = self.f_atraccion(dis)
+            fx = mod_fa * (x2-x1) / dis
+            fy = mod_fa * (y2-y1) / dis
+            self.fuerzasX[v1] += fx
+            self.fuerzasY[v1] += fy
+            self.fuerzasX[v2] -= fx
+            self.fuerzasY[v2] -= fy
+
+    def computar_fuerzas_repulsion(self):
+        for v1 in self.grafo[0]:
+                for v2 in self.grafo[0]:
+                    if v1 != v2:
+                        x1 = self.posicionesX[v1]
+                        x2 = self.posicionesX[v2]
+                        y1 = self.posicionesY[v1]
+                        y2 = self.posicionesY[v2]
+                        dis = math.sqrt(((x2 - x1)**2)+((y2 - y1)**2))
+                        mod_fa = self.f_repulsion(dis)
+                        fx = mod_fa * (x2-x1) / dis
+                        fy = mod_fa * (y2-y1) / dis
+                        self.fuerzasX[v1] += fx
+                        self.fuerzasY[v1] += fy
+                        self.fuerzasX[v2] -= fx
+                        self.fuerzasY[v2] -= fy
+
+    # Aplica el algoritmo de Fruchtermann-Reingold para obtener (y mostrar) un layout
+    def layout(self):
+        self.random_pos()
+
         for iteracion in range(0,self.iters):
             self.inicializar_fuerzas()
             #Calcular fuerzas
-            for ari in self.grafo[1]:
-                fuerza = self.fuerza_atraccion(ari)
-                self.fuerzasX[ari[0]] += fuerza
-                self.fuerzasY[ari[1]] -= fuerza
-                print(ari)
-                print(self.fuerzasX)
-                print(self.fuerzasY)
-
+            self.computar_fuerzas_atraccion()
             for v1 in self.grafo[0]:
                 for v2 in self.grafo[0]:
                     if v1 != v2:
