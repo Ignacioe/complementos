@@ -1,6 +1,7 @@
 import argparse
 from cmath import sqrt
 import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 import numpy as np
 import math
 
@@ -44,10 +45,9 @@ class LayoutGraph:
         return
 
     #Genera el grafico del grafo
-    def dibujar(self):
+    def dibujar(self, ax):
         posXver = self.posicionesX.values()
         posYver = self.posicionesY.values()
-        fig, ax = plt.subplots()
         ax.scatter(posXver, posYver, s = 20, c = "Black")
 
         inicio_x_ari = []
@@ -61,20 +61,20 @@ class LayoutGraph:
             inicio_y_ari.append(self.posicionesY[ari[0]])
             final_y_ari.append(self.posicionesY[ari[1]])
 
-        ax.plot(np.array([inicio_x_ari, final_x_ari]), np.array([inicio_y_ari, final_y_ari]), color="Blue")
+        line, = ax.plot(np.array([inicio_x_ari, final_x_ari]), np.array([inicio_y_ari, final_y_ari]), color="Blue")
 
         ax.set_xlim(0, 10)
         ax.set_ylim(0, 10)
-        plt.show()
+        self.dibujo = line
 
     def random_pos(self):
         for ver in (self.grafo[0]):
             self.posicionesX[ver] = np.random.rand()*10
             self.posicionesY[ver] = np.random.rand()*10
 
-    def f_atraccion(self, d): return d^2/self.k
+    def f_atraccion(self, d): return math.pow(d,2)/self.k
 
-    def f_repulsion(self, d): return self.k^2/d
+    def f_repulsion(self, d): return math.pow(self.k,2)/d
 
     def computar_fuerzas_atraccion(self):
         for ari in self.grafo[1]:
@@ -110,23 +110,47 @@ class LayoutGraph:
                         self.fuerzasX[v2] -= fx
                         self.fuerzasY[v2] -= fy
 
+    def actualizar_pos(self):
+        for ver in self.grafo[0]:
+            nueva_fx = self.posicionesX[ver] + self.fuerzasX[ver]
+            if nueva_fx>=10: nueva_fx = 10
+            if nueva_fx<=0: nueva_fx = 0
+            self.posicionesX[ver] = nueva_fx
+
+            nueva_fy = self.posicionesY[ver] + self.fuerzasY[ver]
+            if nueva_fy>=10: nueva_fy = 10
+            if nueva_fy<=0: nueva_fy = 0
+            self.posicionesY[ver] = nueva_fy
+
+    def computar(self, ax):
+        self.inicializar_fuerzas()
+        self.computar_fuerzas_atraccion()
+        self.computar_fuerzas_repulsion()
+        self.actualizar_pos()
+        
+        inicio_x_ari = []
+        final_x_ari = []
+        inicio_y_ari = []
+        final_y_ari = []
+
+        '''for ari in (self.grafo[1]):
+            inicio_x_ari.append(self.posicionesX[ari[0]])
+            final_x_ari.append(self.posicionesX[ari[1]])
+            inicio_y_ari.append(self.posicionesY[ari[0]])
+            final_y_ari.append(self.posicionesY[ari[1]])
+        self.dibujo = ax.plot(np.array([inicio_x_ari, final_x_ari]), np.array([inicio_y_ari, final_y_ari]), color="Blue")
+        '''
+        return self.dibujo,
+
     # Aplica el algoritmo de Fruchtermann-Reingold para obtener (y mostrar) un layout
     def layout(self):
         self.random_pos()
-
-        for iteracion in range(0,self.iters):
-            self.inicializar_fuerzas()
-            #Calcular fuerzas
-            self.computar_fuerzas_atraccion()
-            for v1 in self.grafo[0]:
-                for v2 in self.grafo[0]:
-                    if v1 != v2:
-                        fuerza = self.fuerza_repulsion(v1,v2)
-                        self.fuerzasX[v1] += fuerza
-                        self.fuerzasY[v2] -= fuerza
-
-        self.dibujar()
-
+        fig, ax = plt.subplots()
+        self.dibujar(ax)
+        '''ani = animation.FuncAnimation(
+            fig, self.computar(ax), interval = 1000, blit=True, repeat = False
+        )'''
+        plt.show()
         pass
 
 def leer_grafo(nom_arch):
@@ -159,7 +183,7 @@ def main():
         '--iters',
         type=int,
         help='Cantidad de iteraciones a efectuar',
-        default=1
+        default=10
     )
     # Temperatura inicial
     parser.add_argument(
