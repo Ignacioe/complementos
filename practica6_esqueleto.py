@@ -130,7 +130,7 @@ class LayoutGraph:
             if dis>0.05:
                 mod_fg = self.gravedad * dis
             else:
-                mod_fr = 1
+                mod_fg = 1
                 dis = 1
             fx = mod_fg * (5-x) / dis
             fy = mod_fg * (5-y) / dis
