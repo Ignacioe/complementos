@@ -45,9 +45,15 @@ class LayoutGraph:
         return
 
     #Genera el grafico del grafo
-    def dibujar(self, ax):
+    def dibujar(self):
+        plt.pause(0.1)
+        plt.clf()
+        ax = plt.gca()
         posXver = self.posicionesX.values()
         posYver = self.posicionesY.values()
+
+        ax.set_xlim(0, 10)
+        ax.set_ylim(0, 10)
         ax.scatter(posXver, posYver, s = 20, c = "Black")
 
         inicio_x_ari = []
@@ -61,11 +67,8 @@ class LayoutGraph:
             inicio_y_ari.append(self.posicionesY[ari[0]])
             final_y_ari.append(self.posicionesY[ari[1]])
 
-        line, = ax.plot(np.array([inicio_x_ari, final_x_ari]), np.array([inicio_y_ari, final_y_ari]), color="Blue")
+        plt.plot(np.array([inicio_x_ari, final_x_ari]), np.array([inicio_y_ari, final_y_ari]), color="Blue")
 
-        ax.set_xlim(0, 10)
-        ax.set_ylim(0, 10)
-        self.dibujo = line
 
     def random_pos(self):
         for ver in (self.grafo[0]):
@@ -85,7 +88,11 @@ class LayoutGraph:
             y1 = self.posicionesY[v1]
             y2 = self.posicionesY[v2]
             dis = math.sqrt(((x2 - x1)**2)+((y2 - y1)**2))
-            mod_fa = self.f_atraccion(dis)
+            if dis!=0:
+                mod_fa = self.f_atraccion(dis)
+            else:
+                mod_fa = 1
+                dis = 1
             fx = mod_fa * (x2-x1) / dis
             fy = mod_fa * (y2-y1) / dis
             self.fuerzasX[v1] += fx
@@ -95,20 +102,24 @@ class LayoutGraph:
 
     def computar_fuerzas_repulsion(self):
         for v1 in self.grafo[0]:
-                for v2 in self.grafo[0]:
-                    if v1 != v2:
-                        x1 = self.posicionesX[v1]
-                        x2 = self.posicionesX[v2]
-                        y1 = self.posicionesY[v1]
-                        y2 = self.posicionesY[v2]
-                        dis = math.sqrt(((x2 - x1)**2)+((y2 - y1)**2))
-                        mod_fa = self.f_repulsion(dis)
-                        fx = mod_fa * (x2-x1) / dis
-                        fy = mod_fa * (y2-y1) / dis
-                        self.fuerzasX[v1] += fx
-                        self.fuerzasY[v1] += fy
-                        self.fuerzasX[v2] -= fx
-                        self.fuerzasY[v2] -= fy
+            for v2 in self.grafo[0]:
+                if v1 != v2:
+                    x1 = self.posicionesX[v1]
+                    x2 = self.posicionesX[v2]
+                    y1 = self.posicionesY[v1]
+                    y2 = self.posicionesY[v2]
+                    dis = math.sqrt(((x2 - x1)**2)+((y2 - y1)**2))
+                    if dis!=0:
+                        mod_fr = self.f_repulsion(dis)
+                    else:
+                        mod_fr = 1
+                        dis = 1
+                    fx = mod_fr * (x2-x1) / dis
+                    fy = mod_fr * (y2-y1) / dis
+                    self.fuerzasX[v1] += fx
+                    self.fuerzasY[v1] += fy
+                    self.fuerzasX[v2] -= fx
+                    self.fuerzasY[v2] -= fy
 
     def actualizar_pos(self):
         for ver in self.grafo[0]:
@@ -122,34 +133,21 @@ class LayoutGraph:
             if nueva_fy<=0: nueva_fy = 0
             self.posicionesY[ver] = nueva_fy
 
-    def computar(self, ax):
+    def computar(self):
         self.inicializar_fuerzas()
         self.computar_fuerzas_atraccion()
         self.computar_fuerzas_repulsion()
         self.actualizar_pos()
-        
-        inicio_x_ari = []
-        final_x_ari = []
-        inicio_y_ari = []
-        final_y_ari = []
-
-        '''for ari in (self.grafo[1]):
-            inicio_x_ari.append(self.posicionesX[ari[0]])
-            final_x_ari.append(self.posicionesX[ari[1]])
-            inicio_y_ari.append(self.posicionesY[ari[0]])
-            final_y_ari.append(self.posicionesY[ari[1]])
-        self.dibujo = ax.plot(np.array([inicio_x_ari, final_x_ari]), np.array([inicio_y_ari, final_y_ari]), color="Blue")
-        '''
-        return self.dibujo,
 
     # Aplica el algoritmo de Fruchtermann-Reingold para obtener (y mostrar) un layout
     def layout(self):
         self.random_pos()
-        fig, ax = plt.subplots()
-        self.dibujar(ax)
-        '''ani = animation.FuncAnimation(
-            fig, self.computar(ax), interval = 1000, blit=True, repeat = False
-        )'''
+        plt.ion()
+        for i in range(0,self.iters):
+            self.computar()
+            self.dibujar()
+        plt.ioff()
+        self.dibujar()
         plt.show()
         pass
 
