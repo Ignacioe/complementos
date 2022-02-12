@@ -46,14 +46,14 @@ class LayoutGraph:
 
     #Genera el grafico del grafo
     def dibujar(self):
-        plt.pause(0.1)
+        plt.pause(1)
         plt.clf()
         ax = plt.gca()
         posXver = self.posicionesX.values()
         posYver = self.posicionesY.values()
 
-        ax.set_xlim(0, 10)
-        ax.set_ylim(0, 10)
+        ax.set_xlim(-1, 11)
+        ax.set_ylim(-1, 11)
         ax.scatter(posXver, posYver, s = 20, c = "Black")
 
         inicio_x_ari = []
@@ -88,7 +88,7 @@ class LayoutGraph:
             y1 = self.posicionesY[v1]
             y2 = self.posicionesY[v2]
             dis = math.sqrt(((x2 - x1)**2)+((y2 - y1)**2))
-            if dis!=0:
+            if dis>0.05:
                 mod_fa = self.f_atraccion(dis)
             else:
                 mod_fa = 1
@@ -109,7 +109,7 @@ class LayoutGraph:
                     y1 = self.posicionesY[v1]
                     y2 = self.posicionesY[v2]
                     dis = math.sqrt(((x2 - x1)**2)+((y2 - y1)**2))
-                    if dis!=0:
+                    if dis>0.05:
                         mod_fr = self.f_repulsion(dis)
                     else:
                         mod_fr = 1
@@ -123,15 +123,18 @@ class LayoutGraph:
 
     def actualizar_pos(self):
         for ver in self.grafo[0]:
-            nueva_fx = self.posicionesX[ver] + self.fuerzasX[ver]
-            if nueva_fx>=10: nueva_fx = 10
-            if nueva_fx<=0: nueva_fx = 0
-            self.posicionesX[ver] = nueva_fx
+            print("Vertice", ver)
+            print("posicion", self.posicionesX[ver])
+            print("fuerza", self.fuerzasX[ver])
+            nueva_posx = self.posicionesX[ver] + self.fuerzasX[ver]
+            if nueva_posx>=10: nueva_posx = 10
+            if nueva_posx<=0: nueva_posx = 0
+            self.posicionesX[ver] = nueva_posx
 
-            nueva_fy = self.posicionesY[ver] + self.fuerzasY[ver]
-            if nueva_fy>=10: nueva_fy = 10
-            if nueva_fy<=0: nueva_fy = 0
-            self.posicionesY[ver] = nueva_fy
+            nueva_posy = self.posicionesY[ver] + self.fuerzasY[ver]
+            if nueva_posy>=10: nueva_posy = 10
+            if nueva_posy<=0: nueva_posy = 0
+            self.posicionesY[ver] = nueva_posy
 
     def computar(self):
         self.inicializar_fuerzas()
@@ -144,10 +147,10 @@ class LayoutGraph:
         self.random_pos()
         plt.ion()
         for i in range(0,self.iters):
-            self.computar()
+            print("Iteracion ", i)
             self.dibujar()
+            self.computar()   
         plt.ioff()
-        self.dibujar()
         plt.show()
         pass
 
@@ -181,7 +184,7 @@ def main():
         '--iters',
         type=int,
         help='Cantidad de iteraciones a efectuar',
-        default=10
+        default=2
     )
     # Temperatura inicial
     parser.add_argument(
