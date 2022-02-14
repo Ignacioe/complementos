@@ -37,7 +37,7 @@ class LayoutGraph:
         self.const_atraccion = const_atraccion
 
         # Cambiar por constantes!!!!!!!!!!!!!!!!!!!!
-        self.ka = 5.0 * math.sqrt(100/len(grafo[0]))
+        self.ka = 10.0 * math.sqrt(100/len(grafo[0]))
         self.kr = 0.1 * math.sqrt(100/len(grafo[0]))
 
     def inicializar_fuerzas(self):
@@ -107,7 +107,6 @@ class LayoutGraph:
         for v1 in nodos:
             nodos = np.delete(nodos,0)
             for v2 in nodos:
-                print("(",v1,",",v2,")")
                 if v1 != v2:
                     x1 = self.posicionesX[v1]
                     x2 = self.posicionesX[v2]
@@ -165,7 +164,6 @@ class LayoutGraph:
         self.random_pos()
         plt.ion()
         for i in range(0,self.iters):
-            print("Iteracion ", i)
             self.dibujar()
             self.computar()   
         plt.ioff()
