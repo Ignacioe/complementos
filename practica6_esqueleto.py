@@ -139,9 +139,9 @@ class LayoutGraph:
 
     def actualizar_pos(self):
         for ver in self.grafo[0]:
-            print("  Vertice", ver)
-            print("    Posicion", self.posicionesX[ver])
-            print("    Fuerza", self.fuerzasX[ver])
+            # print("  Vertice", ver)
+            # print("    Posicion", self.posicionesX[ver])
+            # print("    Fuerza", self.fuerzasX[ver])
             nueva_posx = self.posicionesX[ver] + self.fuerzasX[ver]
             if nueva_posx>=10: nueva_posx = 10
             if nueva_posx<=0: nueva_posx = 0
@@ -154,11 +154,21 @@ class LayoutGraph:
 
     def computar(self):
         self.inicializar_fuerzas()
+        print("Despues de inicializar fuerzas")
+        print("Posicion X:",self.posicionesX)
+        print("Posicion Y:",self.posicionesY)
         self.computar_fuerzas_atraccion()
+        print("Despues de computar atraccion")
+        print("Fuerzas X:",self.fuerzasX)
+        print("Fuerzas Y:",self.fuerzasY)
         self.computar_fuerzas_repulsion()
+        print("Despues de computar repulsion")
+        print("Fuerzas X:",self.fuerzasX)
+        print("Fuerzas Y:",self.fuerzasY)
         self.computar_fuerza_gravedad()
-        print(self.fuerzasX)
-        print(self.fuerzasY)
+        print("Despues de computar gravedad")
+        print("Fuerzas X:",self.fuerzasX)
+        print("Fuerzas Y:",self.fuerzasY)
         self.actualizar_pos()
 
     # Aplica el algoritmo de Fruchtermann-Reingold para obtener (y mostrar) un layout
@@ -210,7 +220,7 @@ def main():
         '--temp',
         type=float,
         help='Temperatura inicial',
-        default=100.0
+        default=1.0
     )
     # Archivo del cual leer el grafo
     parser.add_argument(
