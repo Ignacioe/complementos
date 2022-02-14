@@ -37,8 +37,8 @@ class LayoutGraph:
         self.const_atraccion = const_atraccion
 
         # Cambiar por constantes!!!!!!!!!!!!!!!!!!!!
-        self.ka = 2.4 * math.sqrt(100/len(grafo[0]))
-        self.kr = 0.3 * math.sqrt(100/len(grafo[0]))
+        self.ka = 5.0 * math.sqrt(100/len(grafo[0]))
+        self.kr = 0.1 * math.sqrt(100/len(grafo[0]))
 
     def inicializar_fuerzas(self):
         for nodo in (self.grafo[0]):
@@ -105,8 +105,9 @@ class LayoutGraph:
     def computar_fuerzas_repulsion(self):
         nodos = self.grafo[0].copy()
         for v1 in nodos:
-            del nodos[0]
+            nodos = np.delete(nodos,0)
             for v2 in nodos:
+                print("(",v1,",",v2,")")
                 if v1 != v2:
                     x1 = self.posicionesX[v1]
                     x2 = self.posicionesX[v2]
@@ -142,9 +143,6 @@ class LayoutGraph:
 
     def actualizar_pos(self):
         for ver in self.grafo[0]:
-            # print("  Vertice", ver)
-            # print("    Posicion", self.posicionesX[ver])
-            # print("    Fuerza", self.fuerzasX[ver])
             nueva_posx = self.posicionesX[ver] + self.fuerzasX[ver]
             if nueva_posx>=10: nueva_posx = 10
             if nueva_posx<=0: nueva_posx = 0
@@ -157,21 +155,9 @@ class LayoutGraph:
 
     def computar(self):
         self.inicializar_fuerzas()
-        print("Despues de inicializar fuerzas")
-        print("Posicion X:",self.posicionesX)
-        print("Posicion Y:",self.posicionesY)
         self.computar_fuerzas_atraccion()
-        print("Despues de computar atraccion")
-        print("Fuerzas X:",self.fuerzasX)
-        print("Fuerzas Y:",self.fuerzasY)
         self.computar_fuerzas_repulsion()
-        print("Despues de computar repulsion")
-        print("Fuerzas X:",self.fuerzasX)
-        print("Fuerzas Y:",self.fuerzasY)
         self.computar_fuerza_gravedad()
-        print("Despues de computar gravedad")
-        print("Fuerzas X:",self.fuerzasX)
-        print("Fuerzas Y:",self.fuerzasY)
         self.actualizar_pos()
 
     # Aplica el algoritmo de Fruchtermann-Reingold para obtener (y mostrar) un layout
@@ -216,7 +202,7 @@ def main():
         '--iters',
         type=int,
         help='Cantidad de iteraciones a efectuar',
-        default=200
+        default=150
     )
     # Temperatura inicial
     parser.add_argument(
