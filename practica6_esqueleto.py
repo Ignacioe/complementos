@@ -37,7 +37,8 @@ class LayoutGraph:
         self.const_atraccion = const_atraccion
 
         # Cambiar por constantes!!!!!!!!!!!!!!!!!!!!
-        self.k = 1 * math.sqrt(100/len(grafo[0]))
+        self.ka = 2.4 * math.sqrt(100/len(grafo[0]))
+        self.kr = 0.3 * math.sqrt(100/len(grafo[0]))
 
     def inicializar_fuerzas(self):
         for nodo in (self.grafo[0]):
@@ -47,7 +48,7 @@ class LayoutGraph:
 
     #Genera el grafico del grafo
     def dibujar(self):
-        plt.pause(1)
+        plt.pause(0.001)
         plt.clf()
         ax = plt.gca()
         posXver = self.posicionesX.values()
@@ -76,9 +77,9 @@ class LayoutGraph:
             self.posicionesX[ver] = np.random.rand()*10
             self.posicionesY[ver] = np.random.rand()*10
 
-    def f_atraccion(self, d): return math.pow(d,2)/self.k
+    def f_atraccion(self, d): return math.pow(d,2)/self.ka
 
-    def f_repulsion(self, d): return math.pow(self.k,2)/d
+    def f_repulsion(self, d): return math.pow(self.kr,2)/d
 
     def computar_fuerzas_atraccion(self):
         for ari in self.grafo[1]:
@@ -102,8 +103,10 @@ class LayoutGraph:
             self.fuerzasY[v2] -= fy
 
     def computar_fuerzas_repulsion(self):
-        for v1 in self.grafo[0]:
-            for v2 in self.grafo[0]:
+        nodos = self.grafo[0].copy()
+        for v1 in nodos:
+            del nodos[0]
+            for v2 in nodos:
                 if v1 != v2:
                     x1 = self.posicionesX[v1]
                     x2 = self.posicionesX[v2]
@@ -115,8 +118,8 @@ class LayoutGraph:
                     else:
                         mod_fr = 1
                         dis = 1
-                    fx = mod_fr * (x2-x1) / dis
-                    fy = mod_fr * (y2-y1) / dis
+                    fx = mod_fr * (x1-x2) / dis
+                    fy = mod_fr * (y1-y2) / dis
                     self.fuerzasX[v1] += fx
                     self.fuerzasY[v1] += fy
                     self.fuerzasX[v2] -= fx
@@ -213,14 +216,14 @@ def main():
         '--iters',
         type=int,
         help='Cantidad de iteraciones a efectuar',
-        default=3
+        default=200
     )
     # Temperatura inicial
     parser.add_argument(
         '--temp',
         type=float,
         help='Temperatura inicial',
-        default=1.0
+        default=0.02
     )
     # Archivo del cual leer el grafo
     parser.add_argument(
