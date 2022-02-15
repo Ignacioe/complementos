@@ -7,17 +7,20 @@ import math
 
 class LayoutGraph:
 
-    def __init__(self, grafo, iters, gravedad, refresh, const_repulsion, const_atraccion, verbose=False):
+    def __init__(self, grafo, iters, temperatura, gravedad, refresh, const_repulsion, const_atraccion, verbose):
         """
         Parametros:
         grafo: grafo en formato lista
         iters: cantidad de iteraciones a realizar
+        temperatura: temperatura?
+        gravedad: fuerza con la que se atrae hacia el centro del grafico
         refresh: cada cuantas iteraciones graficar. Si su valor es cero, entonces debe graficarse solo al final.
         const_repulsion: constante de repulsion
         const_atraccion: constante de atraccion
         verbose: si esta encendido, activa los comentarios
         """
 
+        if(verbose): print(" Inicializando el objeto . . .")
         # Guardo el grafo
         self.grafo = grafo
 
@@ -26,25 +29,17 @@ class LayoutGraph:
         self.posicionesY = {}
         self.fuerzasX = {}
         self.fuerzasY = {}
-
-        # Guardo opciones
         self.iters = iters
         self.verbose = verbose
         self.gravedad = gravedad
-        # TODO: faltan opciones
         self.refresh = refresh
         self.const_repulsion = const_repulsion
         self.const_atraccion = const_atraccion
 
         # Cambiar por constantes!!!!!!!!!!!!!!!!!!!!
+        if(verbose): print(" Calculando constantes de atraccion y repulsion . . .")
         self.ka = 10.0 * math.sqrt(100/len(grafo[0]))
         self.kr = 0.1 * math.sqrt(100/len(grafo[0]))
-
-    def inicializar_fuerzas(self):
-        for nodo in (self.grafo[0]):
-            self.fuerzasX[nodo] = 0
-            self.fuerzasY[nodo] = 0
-        return
 
     #Genera el grafico del grafo
     def dibujar(self):
@@ -69,13 +64,25 @@ class LayoutGraph:
             inicio_y_ari.append(self.posicionesY[ari[0]])
             final_y_ari.append(self.posicionesY[ari[1]])
 
+        if(self.verbose): print("  -  Dibujando el grafico . . .")
         plt.plot(np.array([inicio_x_ari, final_x_ari]), np.array([inicio_y_ari, final_y_ari]), color="Blue")
-
 
     def random_pos(self):
         for ver in (self.grafo[0]):
             self.posicionesX[ver] = np.random.rand()*10
             self.posicionesY[ver] = np.random.rand()*10
+        if(self.verbose): 
+            print(" Generando coordenadas iniciales aleatorias para los vertices . . .")
+            print("  -  posicionesX:",self.posicionesX)
+            print("  -  posicionesY:",self.posicionesY)
+
+
+    def inicializar_fuerzas(self):
+        if(self.verbose): print("  -  Inicializando las fuerzas de atraccion y repulsion en 0 . . .")
+        for nodo in (self.grafo[0]):
+            self.fuerzasX[nodo] = 0
+            self.fuerzasY[nodo] = 0
+        return
 
     def f_atraccion(self, d): return math.pow(d,2)/self.ka
 
@@ -101,6 +108,10 @@ class LayoutGraph:
             self.fuerzasY[v1] += fy
             self.fuerzasX[v2] -= fx
             self.fuerzasY[v2] -= fy
+        if(self.verbose): 
+            print("  -  Computando las fuerzas de atraccion . . .")
+            print("  -      fuerzasX:",self.fuerzasX)
+            print("  -      fuerzasY:",self.fuerzasY)
 
     def computar_fuerzas_repulsion(self):
         nodos = self.grafo[0].copy()
@@ -124,6 +135,10 @@ class LayoutGraph:
                     self.fuerzasY[v1] += fy
                     self.fuerzasX[v2] -= fx
                     self.fuerzasY[v2] -= fy
+        if(self.verbose): 
+            print("  -  Computando las fuerzas de repulsion . . .")
+            print("  -      fuerzasX:",self.fuerzasX)
+            print("  -      fuerzasY:",self.fuerzasY)
 
     def computar_fuerza_gravedad(self):
         for v in self.grafo[0]:
@@ -139,6 +154,10 @@ class LayoutGraph:
             fy = mod_fg * (5-y) / dis
             self.fuerzasX[v] += fx
             self.fuerzasY[v] += fy
+        if(self.verbose): 
+            print("  -  Computando las fuerzas de gravedad . . .")
+            print("  -      fuerzasX:",self.fuerzasX)
+            print("  -      fuerzasY:",self.fuerzasY)
 
     def actualizar_pos(self):
         for ver in self.grafo[0]:
@@ -151,8 +170,13 @@ class LayoutGraph:
             if nueva_posy>=10: nueva_posy = 10
             if nueva_posy<=0: nueva_posy = 0
             self.posicionesY[ver] = nueva_posy
+        if(self.verbose):
+            print("  -  Actualizando las posiciones . . .")
+            print("  -      posicionesX:",self.fuerzasX)
+            print("  -      posicionesY:",self.fuerzasY)
 
     def computar(self):
+        if(self.verbose): print("  -  Computando los valores para la proxima iteracion . . .")
         self.inicializar_fuerzas()
         self.computar_fuerzas_atraccion()
         self.computar_fuerzas_repulsion()
@@ -163,11 +187,13 @@ class LayoutGraph:
     def layout(self):
         self.random_pos()
         plt.ion()
+        if(self.verbose): print(" Aplicando el algoritmo de Fruchtermann-Reingold ",self.iters)
         for i in range(0,self.iters):
+            if(self.verbose): print(" Iteracion",i,":")
             self.dibujar()
             self.computar()   
+        if(self.verbose): print(" Algoritmo finalizado en la iteracion ",self.iters)
         plt.ioff()
-        plt.show()
         pass
 
 def leer_grafo(nom_arch):
@@ -189,27 +215,42 @@ def main():
     # Definimos los argumentos de linea de comando que aceptamos
     parser = argparse.ArgumentParser()
 
-    # Verbosidad, opcional, False por defecto
+    # Verbosidad
     parser.add_argument(
         '-v', '--verbose',
         action='store_true',
-        help='Muestra mas informacion al correr el programa'
+        help='Muestra mas informacion al correr el programa',
+        default=False
     )
-    # Cantidad de iteraciones, opcional, 50 por defecto
+    # Cantidad de iteraciones
     parser.add_argument(
         '--iters',
         type=int,
         help='Cantidad de iteraciones a efectuar',
-        default=150
+        default=50
+    )
+    # Refresh
+    parser.add_argument(
+        '--ref',
+        type=int,
+        help='Cantidad de iteraciones entre refrescos de pantalla',
+        default=1
     )
     # Temperatura inicial
     parser.add_argument(
         '--temp',
         type=float,
         help='Temperatura inicial',
+        default=1
+    )
+    # Gravedad
+    parser.add_argument(
+        '--grav',
+        type=float,
+        help='Gravedad',
         default=0.02
     )
-    # Archivo del cual leer el grafo
+    # Archivo a leer
     parser.add_argument(
         'file_name',
         help='Archivo del cual leer el grafo a dibujar'
@@ -221,10 +262,11 @@ def main():
 
     # Creamos nuestro objeto LayoutGraph
     layout_gr = LayoutGraph(
-        grafo=grafo, 
+        grafo=grafo,
         iters=args.iters,
-        gravedad=args.temp,
-        refresh=1,
+        temperatura=args.temp,
+        gravedad=args.grav,
+        refresh=args.ref,
         const_repulsion=0.1,
         const_atraccion=5.0,
         verbose=args.verbose
