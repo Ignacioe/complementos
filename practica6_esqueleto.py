@@ -12,7 +12,7 @@ class LayoutGraph:
         Parametros:
         grafo: grafo en formato lista
         iters: cantidad de iteraciones a realizar
-        temperatura: temperatura?
+        temperatura: temperatura del sistema
         gravedad: fuerza con la que se atrae hacia el centro del grafico
         refresh: cada cuantas iteraciones graficar. Si su valor es cero, entonces debe graficarse solo al final.
         const_repulsion: constante de repulsion
@@ -66,7 +66,7 @@ class LayoutGraph:
             final_y_ari.append(self.posicionesY[ari[1]])
 
         if(self.verbose): print("  -  Dibujando el grafico . . .")
-        plt.plot(np.array([inicio_x_ari, final_x_ari]), np.array([inicio_y_ari, final_y_ari]), color="Blue")
+        plt.plot(np.array([inicio_x_ari, final_x_ari]), np.array([inicio_y_ari, final_y_ari]), color="Blue", lw=0.75)
 
     def random_pos(self):
         for ver in (self.grafo[0]):
@@ -204,10 +204,9 @@ class LayoutGraph:
             refresh-=1
             if(not refresh):
                 if(self.verbose): print(" Iteracion",i,":")
-                self.dibujar()
-                self.computar() 
+                self.dibujar() 
                 refresh = self.refresh
-              
+            self.computar()
         if(self.verbose): print(" Algoritmo finalizado en la iteracion",self.iters)
         plt.ioff()
         pass
@@ -257,14 +256,14 @@ def main():
         '--temp',
         type=float,
         help='Temperatura inicial',
-        default=100
+        default=100.0
     )
     # Gravedad
     parser.add_argument(
         '--grav',
         type=float,
         help='Gravedad',
-        default=0.02
+        default=0.05
     )
     # Archivo a leer
     parser.add_argument(
@@ -284,7 +283,7 @@ def main():
         gravedad=args.grav,
         refresh=args.ref,
         const_repulsion=0.1,
-        const_atraccion=20.0,
+        const_atraccion=50.0,
         verbose=args.verbose
     )
 
