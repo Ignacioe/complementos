@@ -31,6 +31,7 @@ class LayoutGraph:
         self.fuerzasY = {}
         self.iters = iters
         self.verbose = verbose
+        self.temperatura = temperatura
         self.gravedad = gravedad
         self.refresh = refresh
         self.const_repulsion = const_repulsion
@@ -38,8 +39,8 @@ class LayoutGraph:
 
         # Cambiar por constantes!!!!!!!!!!!!!!!!!!!!
         if(verbose): print(" Calculando constantes de atraccion y repulsion . . .")
-        self.ka = 10.0 * math.sqrt(100/len(grafo[0]))
-        self.kr = 0.1 * math.sqrt(100/len(grafo[0]))
+        self.ka = const_atraccion * math.sqrt(100/len(grafo[0]))
+        self.kr = const_repulsion * math.sqrt(100/len(grafo[0]))
 
     #Genera el grafico del grafo
     def dibujar(self):
@@ -87,6 +88,11 @@ class LayoutGraph:
     def f_atraccion(self, d): return math.pow(d,2)/self.ka
 
     def f_repulsion(self, d): return math.pow(self.kr,2)/d
+
+    def actualizar_temp(self): 
+        if(self.verbose): print(" Temperatura actual:",self.temperatura)
+        self.temperatura *= 0.95
+        return
 
     def computar_fuerzas_atraccion(self):
         for ari in self.grafo[1]:
@@ -161,6 +167,10 @@ class LayoutGraph:
 
     def actualizar_pos(self):
         for ver in self.grafo[0]:
+            mod_fa = math.sqrt((self.fuerzasX[ver]**2)+(self.fuerzasY[ver]**2))
+            if(mod_fa > self.temperatura):
+                self.fuerzasX[ver] = self.fuerzasX[ver] * self.temperatura / mod_fa
+                self.fuerzasY[ver] = self.fuerzasX[ver] * self.temperatura / mod_fa
             nueva_posx = self.posicionesX[ver] + self.fuerzasX[ver]
             if nueva_posx>=10: nueva_posx = 10
             if nueva_posx<=0: nueva_posx = 0
@@ -182,17 +192,23 @@ class LayoutGraph:
         self.computar_fuerzas_repulsion()
         self.computar_fuerza_gravedad()
         self.actualizar_pos()
+        self.actualizar_temp()
 
     # Aplica el algoritmo de Fruchtermann-Reingold para obtener (y mostrar) un layout
     def layout(self):
         self.random_pos()
         plt.ion()
         if(self.verbose): print(" Aplicando el algoritmo de Fruchtermann-Reingold ",self.iters)
+        refresh = self.refresh
         for i in range(0,self.iters):
-            if(self.verbose): print(" Iteracion",i,":")
-            self.dibujar()
-            self.computar()   
-        if(self.verbose): print(" Algoritmo finalizado en la iteracion ",self.iters)
+            refresh-=1
+            if(not refresh):
+                if(self.verbose): print(" Iteracion",i,":")
+                self.dibujar()
+                self.computar() 
+                refresh = self.refresh
+              
+        if(self.verbose): print(" Algoritmo finalizado en la iteracion",self.iters)
         plt.ioff()
         pass
 
@@ -227,7 +243,7 @@ def main():
         '--iters',
         type=int,
         help='Cantidad de iteraciones a efectuar',
-        default=50
+        default=200
     )
     # Refresh
     parser.add_argument(
@@ -241,7 +257,7 @@ def main():
         '--temp',
         type=float,
         help='Temperatura inicial',
-        default=1
+        default=100
     )
     # Gravedad
     parser.add_argument(
@@ -268,7 +284,7 @@ def main():
         gravedad=args.grav,
         refresh=args.ref,
         const_repulsion=0.1,
-        const_atraccion=5.0,
+        const_atraccion=20.0,
         verbose=args.verbose
     )
 
