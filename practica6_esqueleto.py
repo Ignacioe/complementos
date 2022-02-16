@@ -263,7 +263,7 @@ def main():
         '--grav',
         type=float,
         help='Gravedad',
-        default=0.05
+        default=0.1
     )
     # Archivo a leer
     parser.add_argument(
@@ -282,7 +282,7 @@ def main():
         temperatura=args.temp,
         gravedad=args.grav,
         refresh=args.ref,
-        const_repulsion=0.1,
+        const_repulsion=0.15,
         const_atraccion=50.0,
         verbose=args.verbose
     )
