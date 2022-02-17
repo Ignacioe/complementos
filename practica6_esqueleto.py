@@ -7,7 +7,7 @@ import math
 
 class LayoutGraph:
 
-    def __init__(self, grafo, iters, temperatura, gravedad, refresh, const_repulsion, const_atraccion, verbose):
+    def __init__(self, grafo, iters, temperatura, gravedad, refresh, const_repulsion, const_atraccion, ancho, verbose):
         """
         Parametros:
         grafo: grafo en formato lista
@@ -36,11 +36,13 @@ class LayoutGraph:
         self.refresh = refresh
         self.const_repulsion = const_repulsion
         self.const_atraccion = const_atraccion
+        self.ancho = ancho
 
-        # Cambiar por constantes!!!!!!!!!!!!!!!!!!!!
         if(verbose): print(" Calculando constantes de atraccion y repulsion . . .")
-        self.ka = const_atraccion * math.sqrt(100/len(grafo[0]))
-        self.kr = const_repulsion * math.sqrt(100/len(grafo[0]))
+        self.ka = const_atraccion * math.sqrt(math.pow(self.ancho,2)/len(grafo[0]))
+        self.kr = const_repulsion * math.sqrt(math.pow(self.ancho,2)/len(grafo[0]))
+
+        self.epsilon = 0.05
 
     #Genera el grafico del grafo
     def dibujar(self):
@@ -70,8 +72,8 @@ class LayoutGraph:
 
     def random_pos(self):
         for ver in (self.grafo[0]):
-            self.posicionesX[ver] = np.random.rand()*10
-            self.posicionesY[ver] = np.random.rand()*10
+            self.posicionesX[ver] = np.random.rand()*self.ancho
+            self.posicionesY[ver] = np.random.rand()*self.ancho
         if(self.verbose): 
             print(" Generando coordenadas iniciales aleatorias para los vertices . . .")
             print("  -  posicionesX:",self.posicionesX)
@@ -94,6 +96,9 @@ class LayoutGraph:
         self.temperatura *= 0.95
         return
 
+    def distancia(self, x1, x2, y1, y2):
+        return math.sqrt(pow((x2 - x1),2)+pow((y2 - y1),2))
+
     def computar_fuerzas_atraccion(self):
         for ari in self.grafo[1]:
             v1 = ari[0]
@@ -102,18 +107,15 @@ class LayoutGraph:
             x2 = self.posicionesX[v2]
             y1 = self.posicionesY[v1]
             y2 = self.posicionesY[v2]
-            dis = math.sqrt(((x2 - x1)**2)+((y2 - y1)**2))
-            if dis>0.05:
+            dis = self.distancia(x1,x2,y1,y2)
+            if dis>self.epsilon:
                 mod_fa = self.f_atraccion(dis)
-            else:
-                mod_fa = 1
-                dis = 1
-            fx = mod_fa * (x2-x1) / dis
-            fy = mod_fa * (y2-y1) / dis
-            self.fuerzasX[v1] += fx
-            self.fuerzasY[v1] += fy
-            self.fuerzasX[v2] -= fx
-            self.fuerzasY[v2] -= fy
+                fx = mod_fa * (x2-x1) / dis
+                fy = mod_fa * (y2-y1) / dis
+                self.fuerzasX[v1] += fx
+                self.fuerzasY[v1] += fy
+                self.fuerzasX[v2] -= fx
+                self.fuerzasY[v2] -= fy
         if(self.verbose): 
             print("  -  Computando las fuerzas de atraccion . . .")
             print("  -      fuerzasX:",self.fuerzasX)
@@ -129,14 +131,17 @@ class LayoutGraph:
                     x2 = self.posicionesX[v2]
                     y1 = self.posicionesY[v1]
                     y2 = self.posicionesY[v2]
-                    dis = math.sqrt(((x2 - x1)**2)+((y2 - y1)**2))
-                    if dis>0.05:
-                        mod_fr = self.f_repulsion(dis)
+                    dis = self.distancia(x1,x2,y1,y2)
+                    if dis < self.epsilon:
+                        v_aleatorio = 0
+                        while v_aleatorio < self.epsilon:
+                            fx = np.random.rand()
+                            fy = np.random.rand()
+                            v_aleatorio = math.sqrt(math.pow(fx,2)+math.pow(fy,2))
                     else:
-                        mod_fr = 1
-                        dis = 1
-                    fx = mod_fr * (x1-x2) / dis
-                    fy = mod_fr * (y1-y2) / dis
+                        mod_fr = self.f_repulsion(dis)
+                        fx = mod_fr * (x1-x2) / dis
+                        fy = mod_fr * (y1-y2) / dis
                     self.fuerzasX[v1] += fx
                     self.fuerzasY[v1] += fy
                     self.fuerzasX[v2] -= fx
@@ -147,17 +152,18 @@ class LayoutGraph:
             print("  -      fuerzasY:",self.fuerzasY)
 
     def computar_fuerza_gravedad(self):
+        centro = self.ancho/2
         for v in self.grafo[0]:
             x = self.posicionesX[v]
             y = self.posicionesY[v]
-            dis = math.sqrt(((5 - x)**2)+((5 - y)**2))
-            if dis>0.05:
+            dis = self.distancia(x,centro,y,centro)
+            if dis > self.epsilon:
                 mod_fg = self.gravedad * dis
+                fx = mod_fg * (centro-x) / dis
+                fy = mod_fg * (centro-y) / dis
             else:
-                mod_fg = 1
-                dis = 1
-            fx = mod_fg * (5-x) / dis
-            fy = mod_fg * (5-y) / dis
+                fx = 0
+                fy = 0
             self.fuerzasX[v] += fx
             self.fuerzasY[v] += fy
         if(self.verbose): 
@@ -172,12 +178,12 @@ class LayoutGraph:
                 self.fuerzasX[ver] = self.fuerzasX[ver] * self.temperatura / mod_fa
                 self.fuerzasY[ver] = self.fuerzasX[ver] * self.temperatura / mod_fa
             nueva_posx = self.posicionesX[ver] + self.fuerzasX[ver]
-            if nueva_posx>=10: nueva_posx = 10
+            if nueva_posx>=self.ancho: nueva_posx = self.ancho
             if nueva_posx<=0: nueva_posx = 0
             self.posicionesX[ver] = nueva_posx
 
             nueva_posy = self.posicionesY[ver] + self.fuerzasY[ver]
-            if nueva_posy>=10: nueva_posy = 10
+            if nueva_posy>=self.ancho: nueva_posy = self.ancho
             if nueva_posy<=0: nueva_posy = 0
             self.posicionesY[ver] = nueva_posy
         if(self.verbose):
@@ -271,6 +277,14 @@ def main():
         help='Archivo del cual leer el grafo a dibujar'
     )
 
+    #Dimensiones del grafico
+    parser.add_argument(
+        '--ancho',
+        type=int,
+        help="Dimensiones del grafico",
+        default = 10
+    )
+
     args = parser.parse_args()
 
     grafo = leer_grafo(args.file_name)
@@ -284,6 +298,7 @@ def main():
         refresh=args.ref,
         const_repulsion=0.15,
         const_atraccion=50.0,
+        ancho=args.ancho,
         verbose=args.verbose
     )
 
