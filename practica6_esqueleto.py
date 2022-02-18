@@ -17,6 +17,7 @@ class LayoutGraph:
         refresh: cada cuantas iteraciones graficar. Si su valor es cero, entonces debe graficarse solo al final.
         const_repulsion: constante de repulsion
         const_atraccion: constante de atraccion
+        ancho: dimensiones del grafico
         verbose: si esta encendido, activa los comentarios
         """
 
@@ -42,6 +43,7 @@ class LayoutGraph:
         self.ka = const_atraccion * math.sqrt(math.pow(self.ancho,2)/len(grafo[0]))
         self.kr = const_repulsion * math.sqrt(math.pow(self.ancho,2)/len(grafo[0]))
 
+        # epsilon: valor minimo para el cual se considera el caso borde
         self.epsilon = 0.05
 
     #Genera el grafico del grafo
@@ -52,8 +54,8 @@ class LayoutGraph:
         posXver = self.posicionesX.values()
         posYver = self.posicionesY.values()
 
-        ax.set_xlim(-1, 11)
-        ax.set_ylim(-1, 11)
+        ax.set_xlim(-(self.ancho*0.1), self.ancho*1.1)
+        ax.set_ylim(-(self.ancho*0.1), self.ancho*1.1)
         ax.scatter(posXver, posYver, s = 20, c = "Black")
 
         inicio_x_ari = []
@@ -108,7 +110,7 @@ class LayoutGraph:
             y1 = self.posicionesY[v1]
             y2 = self.posicionesY[v2]
             dis = self.distancia(x1,x2,y1,y2)
-            if dis>self.epsilon:
+            if dis > self.epsilon:
                 mod_fa = self.f_atraccion(dis)
                 fx = mod_fa * (x2-x1) / dis
                 fy = mod_fa * (y2-y1) / dis
@@ -161,11 +163,8 @@ class LayoutGraph:
                 mod_fg = self.gravedad * dis
                 fx = mod_fg * (centro-x) / dis
                 fy = mod_fg * (centro-y) / dis
-            else:
-                fx = 0
-                fy = 0
-            self.fuerzasX[v] += fx
-            self.fuerzasY[v] += fy
+                self.fuerzasX[v] += fx
+                self.fuerzasY[v] += fy
         if(self.verbose): 
             print("  -  Computando las fuerzas de gravedad . . .")
             print("  -      fuerzasX:",self.fuerzasX)
@@ -271,12 +270,6 @@ def main():
         help='Gravedad',
         default=0.1
     )
-    # Archivo a leer
-    parser.add_argument(
-        'file_name',
-        help='Archivo del cual leer el grafo a dibujar'
-    )
-
     #Dimensiones del grafico
     parser.add_argument(
         '--ancho',
@@ -284,11 +277,15 @@ def main():
         help="Dimensiones del grafico",
         default = 10
     )
-
+    # Archivo a leer
+    parser.add_argument(
+        'file_name',
+        help='Archivo del cual leer el grafo a dibujar'
+    )
+    
     args = parser.parse_args()
 
     grafo = leer_grafo(args.file_name)
-
     # Creamos nuestro objeto LayoutGraph
     layout_gr = LayoutGraph(
         grafo=grafo,
