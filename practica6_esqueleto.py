@@ -7,12 +7,13 @@ import math
 
 class LayoutGraph:
 
-    def __init__(self, grafo, iters, temperatura, gravedad, refresh, const_repulsion, const_atraccion, ancho, verbose):
+    def __init__(self, grafo, iters, temperatura, ktemp, gravedad, refresh, const_repulsion, const_atraccion, ancho, verbose):
         """
         Parametros:
         grafo: grafo en formato lista
         iters: cantidad de iteraciones a realizar
-        temperatura: temperatura del sistema
+        temperatura: temperatura inicial del sistema
+        ktemp: indice de disminucion de temperatura
         gravedad: fuerza con la que se atrae hacia el centro del grafico
         refresh: cada cuantas iteraciones graficar. Si su valor es cero, entonces debe graficarse solo al final.
         const_repulsion: constante de repulsion
@@ -33,6 +34,7 @@ class LayoutGraph:
         self.iters = iters
         self.verbose = verbose
         self.temperatura = temperatura
+        self.ktemp = ktemp
         self.gravedad = gravedad
         self.refresh = refresh
         self.const_repulsion = const_repulsion
@@ -95,7 +97,7 @@ class LayoutGraph:
 
     def actualizar_temp(self): 
         if(self.verbose): print(" Temperatura actual:",self.temperatura)
-        self.temperatura *= 0.95
+        self.temperatura *= self.ktemp
         return
 
     def distancia(self, x1, x2, y1, y2):
@@ -247,7 +249,7 @@ def main():
         '--iters',
         type=int,
         help='Cantidad de iteraciones a efectuar',
-        default=200
+        default=250
     )
     # Refresh
     parser.add_argument(
@@ -261,7 +263,14 @@ def main():
         '--temp',
         type=float,
         help='Temperatura inicial',
-        default=100.0
+        default=100000.0
+    )
+    # Indice de disminucion de temperatura
+    parser.add_argument(
+        '--ktemp',
+        type=float,
+        help='Indice de disminucion de temperatura',
+        default=0.95
     )
     # Gravedad
     parser.add_argument(
@@ -275,7 +284,7 @@ def main():
         '--ancho',
         type=int,
         help="Dimensiones del grafico",
-        default = 10
+        default=10
     )
     # Archivo a leer
     parser.add_argument(
@@ -291,6 +300,7 @@ def main():
         grafo=grafo,
         iters=args.iters,
         temperatura=args.temp,
+        ktemp=args.ktemp,
         gravedad=args.grav,
         refresh=args.ref,
         const_repulsion=0.15,
