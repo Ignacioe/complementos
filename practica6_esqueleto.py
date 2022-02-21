@@ -256,7 +256,7 @@ def main():
         '--temp',
         type=float,
         help='Temperatura inicial',
-        default=1000.0
+        default=100.0
     )
     # Indice de disminucion de temperatura
     parser.add_argument(
@@ -318,7 +318,7 @@ def main():
         gravedad=args.grav,
         refresh=args.ref,
         const_repulsion=args.krep,
-        const_atraccion=args.katr,
+        const_atraccion=math.sqrt(10*len(grafo[1]))-2,
         ancho=args.ancho,
         verbose=args.verbose
     )
