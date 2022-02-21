@@ -249,14 +249,7 @@ def main():
         '--iters',
         type=int,
         help='Cantidad de iteraciones a efectuar',
-        default=250
-    )
-    # Refresh
-    parser.add_argument(
-        '--ref',
-        type=int,
-        help='Cantidad de iteraciones entre refrescos de pantalla',
-        default=1
+        default=200
     )
     # Temperatura inicial
     parser.add_argument(
@@ -278,6 +271,27 @@ def main():
         type=float,
         help='Gravedad',
         default=0.1
+    )
+    # Refresh
+    parser.add_argument(
+        '--ref',
+        type=int,
+        help='Cantidad de iteraciones entre refrescos de pantalla',
+        default=1
+    )
+    # Constante de repulsion
+    parser.add_argument(
+        '--krep',
+        type=float,
+        help='Constante de repulsion',
+        default=0.1
+    )
+    # Constante de atraccion
+    parser.add_argument(
+        '--katr',
+        type=float,
+        help='Constante de atraccion',
+        default=20.0
     )
     #Dimensiones del grafico
     parser.add_argument(
@@ -303,8 +317,8 @@ def main():
         ktemp=args.ktemp,
         gravedad=args.grav,
         refresh=args.ref,
-        const_repulsion=0.15,
-        const_atraccion=50.0,
+        const_repulsion=args.krep,
+        const_atraccion=args.katr,
         ancho=args.ancho,
         verbose=args.verbose
     )
