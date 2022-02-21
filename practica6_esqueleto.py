@@ -256,7 +256,7 @@ def main():
         '--temp',
         type=float,
         help='Temperatura inicial',
-        default=100000.0
+        default=1000.0
     )
     # Indice de disminucion de temperatura
     parser.add_argument(
@@ -290,7 +290,7 @@ def main():
     parser.add_argument(
         '--katr',
         type=float,
-        help='Constante de atraccion',
+        help='Constante de atraccion. Recomendado: 10.0 para grafos sencillos, 50.0 para grafos complejos',
         default=20.0
     )
     #Dimensiones del grafico
