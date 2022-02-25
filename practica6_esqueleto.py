@@ -291,7 +291,6 @@ def main():
         '--katr',
         type=float,
         help='Constante de atraccion. Recomendado: 10.0 para grafos sencillos, 50.0 para grafos complejos',
-        default=20.0
     )
     #Dimensiones del grafico
     parser.add_argument(
@@ -309,6 +308,10 @@ def main():
     args = parser.parse_args()
 
     grafo = leer_grafo(args.file_name)
+
+    if(not args.katr):
+        args.katr = math.sqrt(10*len(grafo[1]))-2
+        
     # Creamos nuestro objeto LayoutGraph
     layout_gr = LayoutGraph(
         grafo=grafo,
@@ -318,7 +321,7 @@ def main():
         gravedad=args.grav,
         refresh=args.ref,
         const_repulsion=args.krep,
-        const_atraccion=math.sqrt(10*len(grafo[1]))-2,
+        const_atraccion=args.katr,
         ancho=args.ancho,
         verbose=args.verbose
     )
